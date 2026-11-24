@@ -11,6 +11,7 @@ import {
   Spin,
   Alert,
   Tooltip,
+  Divider,
 } from "antd";
 import {
   ArrowUpOutlined,
@@ -18,40 +19,49 @@ import {
   FilterOutlined,
   DownloadOutlined,
   ReloadOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import ApexChart from "react-apexcharts";
 import { dashboardAPI } from "../services/api";
 import styled from "styled-components";
+import simonaTheme from "../theme/simonaTheme";
 
 const Container = styled.div`
-  padding: 30px;
-  background-color: #f5f7fa;
+  padding: ${simonaTheme.spacing.xl};
+  background-color: ${simonaTheme.background.primary};
   min-height: 100vh;
 `;
 
 const StyledCard = styled(Card)`
-  border-radius: 12px;
+  border-radius: ${simonaTheme.borderRadius.lg};
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: ${simonaTheme.shadows.md};
+  transition: box-shadow ${simonaTheme.transition.normal}, transform ${simonaTheme.transition.fast};
   
   &:hover {
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: ${simonaTheme.shadows.lg};
+    transform: translateY(-2px);
   }
 `;
 
 const StatisticCard = styled(StyledCard)`
-  background: linear-gradient(135deg, ${props => props.gradient || '#667eea 0%, #764ba2 100%'});
+  background: ${props => props.gradient || `linear-gradient(135deg, ${simonaTheme.primary[500]} 0%, ${simonaTheme.primary[600]} 100%)`};
   color: white;
   
   .ant-statistic-title {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: ${simonaTheme.typography.body2.fontSize};
+    font-weight: 500;
   }
   
   .ant-statistic-content {
     color: white;
-    font-size: 24px;
-    font-weight: bold;
+    font-size: ${simonaTheme.typography.h3.fontSize};
+    font-weight: 700;
+  }
+  
+  .ant-statistic-content-value {
+    color: white;
   }
 `;
 
@@ -59,15 +69,56 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: ${simonaTheme.spacing.xl};
+  padding-bottom: ${simonaTheme.spacing.md};
+  border-bottom: 1px solid ${simonaTheme.border.light};
   
   h1 {
     margin: 0;
-    color: #1a202c;
+    color: ${simonaTheme.neutral[900]};
+    font-size: ${simonaTheme.typography.h2.fontSize};
+    font-weight: ${simonaTheme.typography.h2.fontWeight};
   }
 `;
 
-function Home() {
+const SectionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: ${simonaTheme.spacing.md};
+`;
+
+const StatsRow = styled(Row)`
+  margin-bottom: ${simonaTheme.spacing.xl};
+`;
+
+const ChartRow = styled(Row)`
+  margin-bottom: ${simonaTheme.spacing.xl};
+`;
+
+const ActionButtons = styled.div`
+  display: flex;
+  gap: ${simonaTheme.spacing.sm};
+  align-items: center;
+`;
+
+const CardTitle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: ${simonaTheme.spacing.md};
+  padding-bottom: ${simonaTheme.spacing.sm};
+  border-bottom: 1px solid ${simonaTheme.border.light};
+  
+  h3 {
+    margin: 0;
+    color: ${simonaTheme.neutral[800]};
+    font-size: ${simonaTheme.typography.h3.fontSize};
+    font-weight: ${simonaTheme.typography.h3.fontWeight};
+  }
+`;
+
+function Dashboard() {
   const { Title, Text } = Typography;
   const currentYear = new Date().getFullYear();
 
@@ -121,23 +172,41 @@ function Home() {
       type: "line",
       toolbar: { show: true },
       zoom: { enabled: true },
+      fontFamily: simonaTheme.typography.fontFamily,
     },
     stroke: {
       curve: "smooth",
-      width: 2,
+      width: 3,
     },
-    colors: ["#667eea", "#48bb78"],
+    colors: [simonaTheme.chart.primary, simonaTheme.chart.success],
     xaxis: {
       categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      labels: {
+        style: { colors: simonaTheme.neutral[500], fontSize: '12px' },
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
     },
     yaxis: {
-      title: { text: "Miliar (Rp)" },
+      title: { text: "Miliar (Rp)", style: { color: simonaTheme.neutral[600] } },
+      labels: {
+        style: { colors: simonaTheme.neutral[500], fontSize: '12px' },
+        formatter: (val) => val.toLocaleString('id-ID'),
+      },
     },
     tooltip: {
       theme: "light",
+      style: { fontFamily: simonaTheme.typography.fontFamily },
+      y: { formatter: (val) => `Rp ${val.toLocaleString('id-ID')} Miliar` },
     },
     legend: {
       position: "top",
+      fontSize: '13px',
+      labels: { colors: simonaTheme.neutral[600] },
+    },
+    grid: {
+      borderColor: simonaTheme.border.light,
+      strokeDashArray: 4,
     },
   };
 
@@ -157,20 +226,42 @@ function Home() {
     chart: {
       type: "bar",
       toolbar: { show: false },
+      fontFamily: simonaTheme.typography.fontFamily,
     },
-    colors: ["#667eea"],
+    colors: [simonaTheme.chart.primary],
     xaxis: {
       categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      labels: {
+        style: { colors: simonaTheme.neutral[500], fontSize: '12px' },
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
     },
     yaxis: {
-      title: { text: "Persentase (%)" },
+      title: { text: "Persentase (%)", style: { color: simonaTheme.neutral[600] } },
       max: 100,
+      labels: {
+        style: { colors: simonaTheme.neutral[500], fontSize: '12px' },
+        formatter: (val) => `${val}%`,
+      },
     },
     tooltip: {
       theme: "light",
+      style: { fontFamily: simonaTheme.typography.fontFamily },
+      y: { formatter: (val) => `${val.toFixed(1)}%` },
     },
     dataLabels: {
       enabled: false,
+    },
+    grid: {
+      borderColor: simonaTheme.border.light,
+      strokeDashArray: 4,
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 4,
+        columnWidth: '60%',
+      },
     },
   };
 
@@ -238,7 +329,7 @@ function Home() {
         <Title level={2} style={{ margin: 0 }}>
           Dashboard SPM
         </Title>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <ActionButtons>
           <Select
             value={tahun}
             onChange={setTahun}
@@ -261,7 +352,10 @@ function Home() {
           <Tooltip title="Export">
             <Button icon={<DownloadOutlined />} />
           </Tooltip>
-        </div>
+          <Tooltip title="Settings">
+            <Button icon={<SettingOutlined />} />
+          </Tooltip>
+        </ActionButtons>
       </Header>
 
       {error && (
@@ -270,16 +364,16 @@ function Home() {
           description={error}
           type="error"
           closable
-          style={{ marginBottom: "20px" }}
+          style={{ marginBottom: simonaTheme.spacing.lg }}
           onClose={() => setError("")}
         />
       )}
 
       <Spin spinning={loading} tip="Loading dashboard...">
         {/* Summary Cards */}
-        <Row gutter={[24, 24]} style={{ marginBottom: "30px" }}>
+        <StatsRow gutter={[24, 24]}>
           <Col xs={24} sm={12} lg={6}>
-            <StatisticCard gradient="#667eea 0%, #764ba2 100%">
+            <StatisticCard gradient={`linear-gradient(135deg, ${simonaTheme.primary[500]} 0%, ${simonaTheme.primary[600]} 100%)`}>
               <Statistic
                 title="Total Pagu"
                 value={parseFloat(summary.total_pagu).toLocaleString("id-ID")}
@@ -289,39 +383,36 @@ function Home() {
             </StatisticCard>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <StatisticCard gradient="#48bb78 0%, #38a169 100%">
+            <StatisticCard gradient={`linear-gradient(135deg, ${simonaTheme.success[400]} 0%, ${simonaTheme.success[500]} 100%)`}>
               <Statistic
                 title="Total Realisasi"
                 value={parseFloat(summary.total_realisasi).toLocaleString("id-ID")}
                 suffix="Miliar"
-                valueStyle={{ color: "white" }}
               />
             </StatisticCard>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <StatisticCard gradient="#ed8936 0%, #dd6b20 100%">
+            <StatisticCard gradient={`linear-gradient(135deg, ${simonaTheme.warning[400]} 0%, ${simonaTheme.warning[500]} 100%)`}>
               <Statistic
                 title="Satuan Kerja"
                 value={summary.total_unit}
                 suffix="Unit"
-                valueStyle={{ color: "white" }}
               />
             </StatisticCard>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <StatisticCard gradient="#9f7aea 0%, #805ad5 100%">
+            <StatisticCard gradient={`linear-gradient(135deg, ${simonaTheme.danger[400]} 0%, ${simonaTheme.danger[500]} 100%)`}>
               <Statistic
                 title="Total Program"
                 value={summary.total_program}
                 suffix="Program"
-                valueStyle={{ color: "white" }}
               />
             </StatisticCard>
           </Col>
-        </Row>
+        </StatsRow>
 
         {/* Charts Row */}
-        <Row gutter={[24, 24]} style={{ marginBottom: "30px" }}>
+        <ChartRow gutter={[24, 24]}>
           <Col xs={24} lg={12}>
             <StyledCard title="Trend Pagu vs Realisasi">
               <ApexChart
@@ -342,7 +433,7 @@ function Home() {
               />
             </StyledCard>
           </Col>
-        </Row>
+        </ChartRow>
 
         {/* Top Kegiatan Table */}
         <Row gutter={[24, 24]}>
@@ -356,6 +447,7 @@ function Home() {
                 }))}
                 pagination={{ pageSize: 10, showSizeChanger: false }}
                 loading={loading}
+                rowKey="key"
               />
             </StyledCard>
           </Col>
@@ -365,4 +457,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Dashboard;
